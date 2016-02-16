@@ -7,13 +7,19 @@ var TTTGame = (function(){
 		this.game = phaserGame;
 		this.arrTiles = [];
 		this.numberOfIterations = 0;
+		this.roadStartPosition = {
+			x: GAME_WIDTH + 100,
+			y: GAME_HEIGHT / 2 - 100
+		}
 	}
 
 	TTTGame.prototype.generateRoad = function() {
-		var sprite = this.game.add.sprite(0, 0, 'tile_road_1');
+		// var sprite = this.game.add.sprite(0, 0, 'tile_road_1');
+		var sprite = new Phaser.Sprite(this.game, 0, 0, 'tile_road_1');
+		this.game.world.addChildAt(sprite, 0);
 		sprite.anchor.setTo(0.5, 0.5);
-		sprite.x = this.game.world.centerX;
-		sprite.y = this.game.world.centerY;
+		sprite.x = this.roadStartPosition.x;
+		sprite.y = this.roadStartPosition.y;
 		this.arrTiles.push(sprite);
 	}
 
