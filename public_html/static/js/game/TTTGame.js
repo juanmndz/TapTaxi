@@ -27,13 +27,27 @@ var TTTGame = (function(){
 		};
 
 	}
-	TTTGame.prototype.taxiJump = function() {
-		this.currentJumpHeight -= this.jumpSpeed;
-		this.jumpSpeed -= 0.5;
-		if (this.jumpSpeed < -JUMP_HEIGHT) {
-			this.jumpSpeed = JUMP_HEIGHT;
-			this.isJumping = false;
-		};
+
+
+
+	TTTGame.prototype.preload = function() {
+		//This.game.load is an instance of the Phaser.Loader class
+		this.game.load.image('tile_road_1', 'static/img/assets/tile_road_1.png');
+		this.game.load.image('taxi', 'static/img/assets/taxi.png');
+
+	};
+
+	TTTGame.prototype.init = function() {
+		this.game.stage.backgroundColor = '#9bd3e1';
+		this.game.add.plugin(Phaser.Plugin.Debug);
+
+	};
+
+	TTTGame.prototype.create = function() {
+		this.generateRoad();
+		this.taxi = new Phaser.Sprite(this.game, GAME_WIDTH / 2, GAME_HEIGHT / 2, 'taxi');
+		this.game.world.addChild(this.taxi);
+		this.taxi.anchor.setTo(0.5, 1);
 	};
 
 	TTTGame.prototype.calculatePositionOnRoadWithXposition = function(xPos) {
@@ -74,26 +88,6 @@ var TTTGame = (function(){
 		}
 	};
 
-	TTTGame.prototype.init = function() {
-		this.game.stage.backgroundColor = '#9bd3e1';
-		this.game.add.plugin(Phaser.Plugin.Debug);
-
-	};
-
-	TTTGame.prototype.preload = function() {
-		//This.game.load is an instance of the Phaser.Loader class
-		this.game.load.image('tile_road_1', 'static/img/assets/tile_road_1.png');
-		this.game.load.image('taxi', 'static/img/assets/taxi.png');
-
-	};
-
-	TTTGame.prototype.create = function() {
-		this.generateRoad();
-		this.taxi = new Phaser.Sprite(this.game, GAME_WIDTH / 2, GAME_HEIGHT / 2, 'taxi');
-		this.game.world.addChild(this.taxi);
-		this.taxi.anchor.setTo(0.5, 1);
-	};
-
 	TTTGame.prototype.touchDown = function() {
 		this.mouseTouchDown = true;
 
@@ -104,6 +98,15 @@ var TTTGame = (function(){
 
 	TTTGame.prototype.touchUp = function() {
 		this.mouseTouchUp = false;
+	};
+
+	TTTGame.prototype.taxiJump = function() {
+	this.currentJumpHeight -= this.jumpSpeed;
+	this.jumpSpeed -= 0.5;
+		if (this.jumpSpeed < -JUMP_HEIGHT) {
+			this.jumpSpeed = JUMP_HEIGHT;
+			this.isJumping = false;
+		};
 	};
 
 	TTTGame.prototype.update = function() {
