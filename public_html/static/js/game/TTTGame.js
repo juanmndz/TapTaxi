@@ -6,7 +6,9 @@ var TTTGame = (function(){
 
 	function TTTGame(phaserGame) {
 		this.game = phaserGame;
+
 		this.arrTiles = [];
+		this.taxi = undefined;
 		this.numberOfIterations = 0;
 		this.roadStartPosition = {
 			x: GAME_WIDTH + 100,
@@ -48,11 +50,18 @@ var TTTGame = (function(){
 	TTTGame.prototype.preload = function() {
 		//This.game.load is an instance of the Phaser.Loader class
 		this.game.load.image('tile_road_1', 'static/img/assets/tile_road_1.png');
+		this.game.load.image('taxi', 'static/img/assets/taxi.png');
 
 	};
 
 	TTTGame.prototype.create = function() {
 		this.generateRoad();
+
+		var x = this.game.world.centerX;
+		var y = this.game.world.centerX;
+		this.taxi = new Phaser.Sprite(this.game, x, y, 'taxi');
+		this.taxi.anchor.setTo(0.5, 1.0);
+		this.game.add.existing(this.taxi);
 	};
 	 
 	 TTTGame.prototype.update = function() {
