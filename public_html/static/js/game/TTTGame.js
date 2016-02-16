@@ -1,10 +1,12 @@
 var TTTGame = (function(){
 
 	var ANGLE = 26.55;
+	var TILE_WIDTH = 68;
 
 	function TTTGame(phaserGame) {
 		this.game = phaserGame;
 		this.arrTiles = [];
+		this.numberOfIterations = 0;
 	}
 
 	TTTGame.prototype.generateRoad = function() {
@@ -42,6 +44,12 @@ var TTTGame = (function(){
 	};
 	 
 	 TTTGame.prototype.update = function() {
+	 	this.numberOfIterations++;
+	 	if(this.numberOfIterations > TILE_WIDTH) {
+	 		this.numberOfIterations = 0;
+	 		this.generateRoad();
+
+	 	}
 	 	this.moveTiles();
 
 	};
