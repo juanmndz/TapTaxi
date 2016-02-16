@@ -3,24 +3,41 @@ var TTTGame = (function(){
 	var ANGLE = 26.55;
 	var TILE_WIDTH = 68;
 	var SPEED = 5;
+	var TAXI_START_X = 30;
+
 
 	function TTTGame(phaserGame) {
 		this.game = phaserGame;
 
 		this.arrTiles = [];
 		this.taxi = undefined;
+		this.taxiX = TAXI_START_X;
 		this.numberOfIterations = 0;
 		this.roadStartPosition = {
 			x: GAME_WIDTH + 100,
 			y: GAME_HEIGHT / 2 - 100
 		}
+
 	}
 
-	TTTGame.prototype.generateRoad = function() {
+	TTTGame.prototype.calculatePositionOnRoadWithXposition = function(xPos) {
+    // Calculate our triangle
+    var adjacent = this.roadStartPosition.x - xPos;
+    var alpha = ANGLE * Math.PI / 180;
+    var hypotenuse = adjacent / Math.cos(alpha);
+    var opposite = Math.sin(alpha) * hypotenuse;
+
+    return {
+    	x: xPos,
+        // -57 to position the taxi on the road
+        y: this.roadStartPosition.y + opposite - 57
+    };
+};
+TTTGame.prototype.generateRoad = function() {
 		// var sprite = this.game.add.sprite(0, 0, 'tile_road_1');
 		var sprite = new Phaser.Sprite(this.game, 0, 0, 'tile_road_1');
 		this.game.world.addChildAt(sprite, 0);
-		sprite.anchor.setTo(0.5, 0.5);
+		sprite.anchor.setTo(0.5, 1.0);
 		sprite.x = this.roadStartPosition.x;
 		sprite.y = this.roadStartPosition.y;
 		this.arrTiles.push(sprite);
@@ -56,22 +73,22 @@ var TTTGame = (function(){
 
 	TTTGame.prototype.create = function() {
 		this.generateRoad();
-
-		var x = this.game.world.centerX;
-		var y = this.game.world.centerX;
-		this.taxi = new Phaser.Sprite(this.game, x, y, 'taxi');
-		this.taxi.anchor.setTo(0.5, 1.0);
-		this.game.add.existing(this.taxi);
+		this.taxi = new Phaser.Sprite(this.game, GAME_WIDTH / 2, GAME_HEIGHT / 2, 'taxi');
+		this.game.world.addChild(this.taxi);
+		this.taxi.anchor.setTo(0.5, 1);
 	};
-	 
-	 TTTGame.prototype.update = function() {
-	 	this.numberOfIterations++;
-	 	if(this.numberOfIterations > TILE_WIDTH / SPEED) {
-	 		this.numberOfIterations = 0;
-	 		this.generateRoad();
 
-	 	}
-	 	this.moveTilesWithSpeed(SPEED);
+	TTTGame.prototype.update = function() {
+		this.numberOfIterations++;
+		if(this.numberOfIterations > TILE_WIDTH / SPEED) {
+			this.numberOfIterations = 0;
+			this.generateRoad();
+
+		}
+		var pointOnRoad = this.calculatePositionOnRoadWithXposition(this.taxiX);
+		this.taxi.x = pointOnRoad.x;
+		this.taxi.y = pointOnRoad.y;
+		this.moveTilesWithSpeed(SPEED);
 
 	};
 
