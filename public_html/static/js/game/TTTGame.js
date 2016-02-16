@@ -50,15 +50,15 @@ var TTTGame = (function(){
 		this.taxi.anchor.setTo(0.5, 1);
 	};
 
-	TTTGame.prototype.calculatePositionOnRoadWithXposition = function(xPos) {
+	TTTGame.prototype.calculatePositionOnRoadWithXPosition = function(xpos) {
     // Calculate our triangle
-    var adjacent = this.roadStartPosition.x - xPos;
+    var adjacent = this.roadStartPosition.x - xpos;
     var alpha = ANGLE * Math.PI / 180;
     var hypotenuse = adjacent / Math.cos(alpha);
     var opposite = Math.sin(alpha) * hypotenuse;
 
     return {
-    	x: xPos,
+    	x: xpos,
         // -57 to position the taxi on the road
         y: this.roadStartPosition.y + opposite - 57
     };
@@ -90,19 +90,18 @@ var TTTGame = (function(){
 
 	TTTGame.prototype.touchDown = function() {
 		this.mouseTouchDown = true;
-
 		if (!this.isJumping) {
 			this.isJumping = true;
 		};
 	};
 
 	TTTGame.prototype.touchUp = function() {
-		this.mouseTouchUp = false;
+		this.mouseTouchDown = false;
 	};
 
 	TTTGame.prototype.taxiJump = function() {
-	this.currentJumpHeight -= this.jumpSpeed;
-	this.jumpSpeed -= 0.5;
+		this.currentJumpHeight -= this.jumpSpeed;
+		this.jumpSpeed -= 0.5;
 		if (this.jumpSpeed < -JUMP_HEIGHT) {
 			this.jumpSpeed = JUMP_HEIGHT;
 			this.isJumping = false;
@@ -133,7 +132,7 @@ var TTTGame = (function(){
 			this.taxiJump();
 		}
 
-		var pointOnRoad = this.calculatePositionOnRoadWithXposition(this.taxiX);
+		var pointOnRoad = this.calculatePositionOnRoadWithXPosition(this.taxiX);
 		this.taxi.x = pointOnRoad.x;
 		this.taxi.y = pointOnRoad.y + this.currentJumpHeight;
 
