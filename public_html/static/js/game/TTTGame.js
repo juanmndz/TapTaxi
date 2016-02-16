@@ -4,21 +4,37 @@ var TTTGame = (function(){
 	var TILE_WIDTH = 68;
 	var SPEED = 5;
 	var TAXI_START_X = 30;
+	var JUMP_HEIGHT = 7;
 
 
 	function TTTGame(phaserGame) {
 		this.game = phaserGame;
 
+		this.mouseTouchDown = false;
+
 		this.arrTiles = [];
+		
+		this.jumpSpeed = JUMP_HEIGHT;
+		this.isJumping = false;
+		this.currentJumpHeight = 0;
+		
 		this.taxi = undefined;
 		this.taxiX = TAXI_START_X;
 		this.numberOfIterations = 0;
 		this.roadStartPosition = {
 			x: GAME_WIDTH + 100,
-			y: GAME_HEIGHT / 2 - 100
-		}
+			y: GAME_HEIGHT / 2 - 100,
+		};
 
 	}
+	TTTGame.prototype.taxiJump = function() {
+		this.currentJumpHeight -= this.jumpSpeed;
+		this.jumpSpeed -= 0.5;
+		if (this.jumpSpeed < -JUMP_HEIGHT) {
+			this.jumpSpeed = JUMP_HEIGHT;
+			this.isJumping = false;
+		};
+	};
 
 	TTTGame.prototype.calculatePositionOnRoadWithXposition = function(xPos) {
     // Calculate our triangle
@@ -33,7 +49,7 @@ var TTTGame = (function(){
         y: this.roadStartPosition.y + opposite - 57
     };
 };
-TTTGame.prototype.generateRoad = function() {
+	TTTGame.prototype.generateRoad = function() {
 		// var sprite = this.game.add.sprite(0, 0, 'tile_road_1');
 		var sprite = new Phaser.Sprite(this.game, 0, 0, 'tile_road_1');
 		this.game.world.addChildAt(sprite, 0);
@@ -41,7 +57,7 @@ TTTGame.prototype.generateRoad = function() {
 		sprite.x = this.roadStartPosition.x;
 		sprite.y = this.roadStartPosition.y;
 		this.arrTiles.push(sprite);
-	}
+	};
 
 	TTTGame.prototype.moveTilesWithSpeed = function(speed) {
 		var i = this.arrTiles.length - 1;
@@ -78,18 +94,47 @@ TTTGame.prototype.generateRoad = function() {
 		this.taxi.anchor.setTo(0.5, 1);
 	};
 
-	TTTGame.prototype.update = function() {
-		this.numberOfIterations++;
-		if(this.numberOfIterations > TILE_WIDTH / SPEED) {
-			this.numberOfIterations = 0;
-			this.generateRoad();
+	TTTGame.prototype.touchDown = function() {
+		this.mouseTouchDown = true;
 
+		if (!this.isJumping) {
+			this.isJumping = true;
+		};
+	};
+
+	TTTGame.prototype.touchUp = function() {
+		this.mouseTouchUp = false;
+	};
+
+	TTTGame.prototype.update = function() {
+		// Gets called at 60fps
+
+		if (this.game.input.activePointer.isDown) {
+			if (!this.mouseTouchDown) {
+				this.touchDown();
+			};
+		} else {
+			if (this.mouseTouchDown) {
+				this.touchUp();
+			};
 		}
+
+		this.numberOfIterations++;
+
+		if (this.numberOfIterations > TILE_WIDTH / SPEED) {
+			this.generateRoad();
+			this.numberOfIterations = 0;
+		}
+
+		if (this.isJumping) {
+			this.taxiJump();
+		}
+
 		var pointOnRoad = this.calculatePositionOnRoadWithXposition(this.taxiX);
 		this.taxi.x = pointOnRoad.x;
-		this.taxi.y = pointOnRoad.y;
-		this.moveTilesWithSpeed(SPEED);
+		this.taxi.y = pointOnRoad.y + this.currentJumpHeight;
 
+		this.moveTilesWithSpeed(SPEED);
 	};
 
 	return TTTGame;
